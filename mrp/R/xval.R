@@ -25,7 +25,6 @@
         index <- paste(index, M@data[, i], sep=":")
 
     if(missing(loss.type)) loss.type <- "log"
-    ##            require(doMC, quietly=T)
     response <- M@data[,c("response.yes", "response.no")];
     response <- ceiling(response) # annoying floating point rounding errors
     partition <- array(0, dim=c(2, 2, nrow(response), K))
@@ -48,7 +47,7 @@
     })
 
     if(loss.type=="log") {
-        k <- 1 ## bound below but this silences 'note' from CHECK
+        k <- 1
         loss <- parallel::mclapply(1:K, function(k){
             response <- as.matrix((listofpartition[[k]]$training)[, c("response.yes", "response.no")])
             attr(fm, ".Environment") <- environment() ## crucial!! Environment of formula!!
@@ -123,6 +122,7 @@
     LB <- -sum(M@data$response.yes*log(yhat) + M@data$response.no*log(1-yhat))
     return(list(MulRes=aa, MulFormula=fm, ClaRes=cl.aa,  ClaFormula=cl.fm, LB=LB))
 }
+
 ##' Run k-fold cross validations on mrp model
 ##'
 ##' Run a (binomial) multilevel regression in survey data for later
@@ -157,18 +157,3 @@ setMethod(f="xval",
           signature=signature(object="mrp"),
           definition=.xval
           )
-
-########## CAN WE KILL THIS unused fn ?
-##########
-## lb <- function(object){
-##   M <- object@data
-##   resp <- ddply(M, .(state, income), function(x) {
-##     if(is.null(dim(x)))
-##       return(c(0,0))
-##     else
-##       apply(cbind(x$response.yes, x$response.no), 2, sum)
-##   }
-##                 )
-##   resp1 <- ddply(resp, .(state, income), function(x) c(x$V1/(x$V1+x$V2+1), (x$V1+x$V2)))
-##   with(resp1, {-sum(((V1*log(V1+.0001)+(1-V1)*log(1-V1+0.0001)))*V2)})
-## }

@@ -115,9 +115,7 @@
 }
 \examples{
 \donttest{
-library(mrpdata)
-library(mrp)
-
+##'
 ## Load example data.
 data(CCES.complete)
 
