@@ -56,5 +56,8 @@ test_that("warning fixture does, then does not, warn, and does not throw", funct
 })
 
 test_that("warnings are captured", function() {
-    expect_true(FALSE)
+    sut <- fickleWarn$new()
+    nsims <- 3
+    listOfResults <- lapply(1:nsims, , sut$doSomethingThatMightWarn())
+    expect_is(attr(listOfResults,"warnings"), "list")
 })
